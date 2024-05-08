@@ -1,3 +1,7 @@
+import {cart, addToCart} from "../data/cart.js";
+import { products } from "../data/products.js";
+import { formatCurrency } from "./utils/money.js";
+
 let productsHTML = '';
 
 products.forEach((product) => {
@@ -21,11 +25,11 @@ products.forEach((product) => {
       </div>
 
       <div class="product-price">
-        $${(product.priceCents / 100).toFixed(2)}
+        $${formatCurrency(product.priceCents)}
       </div>
 
       <div class="product-quantity-container">
-        <select>
+        <select class = "select-quantity">
           <option selected value="1">1</option>
           <option value="2">2</option>
           <option value="3">3</option>
@@ -56,35 +60,60 @@ products.forEach((product) => {
 
 document.querySelector('.js-products-grid').innerHTML = productsHTML;
 
+function updateCartQuantity() {
+  let cartQuantity = 0;
+
+  cart.forEach((CartItem) => {
+    cartQuantity += CartItem.quantity;
+  });
+
+  document.querySelector('.js-cart-quantity')
+    .innerHTML = cartQuantity;
+
+}
+
 document.querySelectorAll('.js-add-to-cart')
   .forEach((button) => {
+
     button.addEventListener('click', () => {
       const productId = button.dataset.productId;
+      addToCart(productId);
+      updateCartQuantity();
+    
+    });
+  });
 
-      let matchingItem;
 
-      cart.forEach((item) => {
-        if (productId === item.productId) {
-          matchingItem = item;
-        }
-      });
+  /* Select quantity should go to the cart
+  
+  CODE:
+
+document.querySelectorAll('.js-add-to-cart').forEach((button) => {
+  button.addEventListener('click', () => {
+      const productId = button.dataset.productId;
+      const quantitySelector = document.querySelector('.select-quantity');
+
+      const quantity = Number(quantitySelector.value);
+
+      let matchingItem = cart.find((item) => item.productId === productId);
 
       if (matchingItem) {
-        matchingItem.quantity += 1;
+          matchingItem.quantity += quantity;
       } else {
-        cart.push({
-          productId: productId,
-          quantity: 1
-        });
+          cart.push({
+              productId: productId,
+              quantity: quantity
+          });
       }
 
       let cartQuantity = 0;
-
       cart.forEach((item) => {
-        cartQuantity += item.quantity;
+          cartQuantity += item.quantity;
       });
 
-      document.querySelector('.js-cart-quantity')
-        .innerHTML = cartQuantity;
-    });
+      document.querySelector('.js-cart-quantity').innerHTML = cartQuantity;
   });
+});
+
+
+  */
